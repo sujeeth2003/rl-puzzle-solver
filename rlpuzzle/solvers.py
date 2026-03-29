@@ -27,3 +27,18 @@ def astar(env, start, limit=500000):
                 heapq.heappush(pq, (cost + 1 + manhattan(t, env.n), tie, cost + 1, t))
     return None
 
+
+class QAgent:
+    def __init__(self, alpha=0.5, gamma=0.97, seed=0):
+        self.q, self.alpha, self.gamma, self.rng = {}, alpha, gamma, random.Random(seed)
+
+    def values(self, s):
+        return self.q.setdefault(s, [0.0, 0.0, 0.0, 0.0])
+
+    def act(self, s, eps):
+        v = self.values(s)
+        if self.rng.random() < eps:
+            return self.rng.randrange(4)
+        m = max(v)
+        return self.rng.choice([a for a in range(4) if v[a] == m])
+
