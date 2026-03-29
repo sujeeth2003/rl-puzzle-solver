@@ -48,3 +48,25 @@ class QAgent:
         v[a] += self.alpha * (target - v[a])
 
 
+def train(env, agent, episodes=40000, max_scramble=12, eps_start=0.6, eps_end=0.05, log=None):
+    """Curriculum: scramble depth grows with the training-time solve rate, so the agent first learns
+    'one move from the goal', then 'two moves', ... Sparse reward on a 181k-state puzzle is otherwise unreachable."""
+    depth, window = 1, []
+    for ep in range(episodes):
+        eps = eps_end + (eps_start - eps_end) * max(0.0, 1 - ep / (0.8 * episodes))
+        s = env.reset(agent.rng.randint(max(1, depth - 2), depth))
+        env.max_steps = 6 * depth + 10
+        done = False
+        while not done:
+            a = agent.act(s, eps)
+            s2, r, done, info = env.step(a)
+            agent.update(s, a, r, s2, info["solved"])
+            s = s2
+        window.append(info["solved"])
+        if len(window) >= 300:
+            rate = sum(window[-300:]) / 300
+            if rate > 0.85 and depth < max_scramble:
+                depth += 1; window = []
+                if log: log(ep, depth, rate)
+    return depth
+
