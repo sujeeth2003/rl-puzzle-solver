@@ -70,3 +70,18 @@ def train(env, agent, episodes=40000, max_scramble=12, eps_start=0.6, eps_end=0.
                 if log: log(ep, depth, rate)
     return depth
 
+
+def solve_greedy(env, agent, start, max_steps=60):
+    """Follow the learned greedy policy; a visited-state penalty breaks cycles. Returns move list or None."""
+    s, path, seen = start, [], {start: 1}
+    for _ in range(max_steps):
+        if s == env.goal:
+            return path
+        v = agent.q.get(s)
+        opts = env.neighbors(s)
+        if v is None:
+            a, t = agent.rng.choice(opts)
+        else:
+            a, t = max(opts, key=lambda at: v[at[0]] - 2.0 * seen.get(at[1], 0))
+        path.append(a); s = t; seen[s] = seen.get(s, 0) + 1
+    return path if s == env.goal else None
