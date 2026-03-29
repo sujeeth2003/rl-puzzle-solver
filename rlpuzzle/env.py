@@ -8,3 +8,24 @@ import random
 ACTIONS = ((-1, 0), (1, 0), (0, -1), (0, 1))
 
 
+class SlidingPuzzle:
+    def __init__(self, n=3, seed=None, max_steps=100):
+        self.n, self.max_steps = n, max_steps
+        self.goal = tuple(list(range(1, n * n)) + [0])
+        self.rng = random.Random(seed)
+        self.state, self.steps = self.goal, 0
+
+    # ---- pure functions on states (used by the solvers) -----------------------
+    def neighbors(self, s):
+        """[(action, next_state)] for every legal move."""
+        n, b = self.n, s.index(0)
+        r, c = divmod(b, n)
+        out = []
+        for a, (dr, dc) in enumerate(ACTIONS):
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < n and 0 <= nc < n:
+                t = list(s); j = nr * n + nc
+                t[b], t[j] = t[j], t[b]
+                out.append((a, tuple(t)))
+        return out
+
