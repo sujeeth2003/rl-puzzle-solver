@@ -20,3 +20,8 @@ The reward is sparse (only the goal pays) and the puzzle has 181,440 reachable s
 ```
 Honest reading: the agent is **optimal up to about 12 scrambled moves** and then degrades sharply, because it has only visited about 87k of the 181k states and never trained beyond depth 14. Deeper puzzles fall outside what tabular Q-learning learned. A\* solves everything optimally, so for a puzzle this size classic search wins; the point of the project is to see where RL works, where it breaks, and why (sparse reward, state coverage, curriculum). Natural next steps: a neural value function (DQN) to generalise across states, or using A\* as the teacher.
 
+## Run
+```bash
+python -m unittest discover -s tests       # 5 tests (A* optimality/admissible heuristic, solvability, env rules, learning)
+python run_experiment.py
+```
