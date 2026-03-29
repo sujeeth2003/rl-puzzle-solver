@@ -62,3 +62,11 @@ class SlidingPuzzle:
             reward += 20.0
         return self.state, reward, done or self.steps >= self.max_steps, {"solved": done}
 
+
+def manhattan(s, n=3):
+    d = 0
+    for i, v in enumerate(s):
+        if v:
+            g = v - 1
+            d += abs(i // n - g // n) + abs(i % n - g % n)
+    return d
