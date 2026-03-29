@@ -42,3 +42,9 @@ class QAgent:
         m = max(v)
         return self.rng.choice([a for a in range(4) if v[a] == m])
 
+    def update(self, s, a, r, s2, done):
+        v = self.values(s)
+        target = r if done else r + self.gamma * max(self.values(s2))
+        v[a] += self.alpha * (target - v[a])
+
+
