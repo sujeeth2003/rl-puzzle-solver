@@ -29,3 +29,18 @@ class SlidingPuzzle:
                 out.append((a, tuple(t)))
         return out
 
+    def scramble(self, moves):
+        """Random walk from the goal (never immediately undoing a move): always solvable, difficulty = `moves`."""
+        s, prev = self.goal, None
+        for _ in range(moves):
+            opts = [t for _, t in self.neighbors(s) if t != prev]
+            prev, s = s, self.rng.choice(opts)
+        return s
+
+    def solvable(self, s):
+        inv = sum(1 for i in range(len(s)) for j in range(i + 1, len(s)) if s[i] and s[j] and s[i] > s[j])
+        if self.n % 2 == 1:
+            return inv % 2 == 0
+        row_from_bottom = self.n - s.index(0) // self.n
+        return (inv + row_from_bottom) % 2 == 1
+
