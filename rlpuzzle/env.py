@@ -44,3 +44,21 @@ class SlidingPuzzle:
         row_from_bottom = self.n - s.index(0) // self.n
         return (inv + row_from_bottom) % 2 == 1
 
+    # ---- Gym-style API ---------------------------------------------------------
+    def reset(self, scramble_moves=20):
+        self.state, self.steps = self.scramble(scramble_moves), 0
+        return self.state
+
+    def step(self, action):
+        self.steps += 1
+        nxt = dict(self.neighbors(self.state)).get(action)
+        reward = -1.0
+        if nxt is None:
+            reward -= 1.0
+        else:
+            self.state = nxt
+        done = self.state == self.goal
+        if done:
+            reward += 20.0
+        return self.state, reward, done or self.steps >= self.max_steps, {"solved": done}
+
